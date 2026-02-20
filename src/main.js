@@ -1,26 +1,27 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 // --- 1. 初始化场景、相机、渲染器 ---
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x222222);
+scene.background = new THREE.Color(0x222222); // 深灰背景
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(3, 2, 5); // 初始位置
+camera.position.set(3, 2, 5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.shadowMap.enabled = true; // 如果需要阴影
 document.body.appendChild(renderer.domElement);
 
 // --- 2. 控制器 ---
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
+controls.enableDamping = true;      // 启用惯性
 controls.dampingFactor = 0.05;
-controls.autoRotate = false;
+controls.autoRotate = false;        // 是否自动旋转
 controls.target.set(0, 0, 0);
 
-// --- 3. 灯光（增强版，确保照亮各个方向）---
+// --- 3. 灯光（保证模型被充分照亮）---
 const ambientLight = new THREE.AmbientLight(0x404060);
 scene.add(ambientLight);
 
@@ -36,87 +37,59 @@ const pointLight = new THREE.PointLight(0xffffff, 0.6);
 pointLight.position.set(0, 3, 0);
 scene.add(pointLight);
 
-// --- 4. 辅助元素：坐标轴、网格、红色参照立方体 ---
-const axesHelper = new THREE.AxesHelper(3);
-scene.add(axesHelper);
-
+// --- 4. 辅助网格（放在 y=0 平面）---
 const gridHelper = new THREE.GridHelper(10, 20, 0x888888, 0x444444);
-gridHelper.position.y = -0.5;
+gridHelper.position.y = 0;
 scene.add(gridHelper);
 
-const cubeGeo = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-const cubeMat = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-const cube = new THREE.Mesh(cubeGeo, cubeMat);
-cube.position.set(0, 0, 0);
-scene.add(cube);
+// --- 5. 加载 glTF 模型 ---
+const loader = new GLTFLoader();
 
-// --- 5. 加载模型（OBJ格式）---
-const objLoader = new OBJLoader();
+// ⚠️ 请将 '你的模型文件名.glb' 替换为实际的文件名（放在 public 文件夹内）
+const modelFileName = 't2.glb';
 
-// ⚠️ 请修改为你的实际模型文件名（放在 public 文件夹内）
-const modelFileName = 'tea.obj';
-
-objLoader.load(
+loader.load(
     modelFileName,
-    (object) => {
-        console.log('✅ 模型加载成功！', object);
+    (gltf) => {
+        const model = gltf.scene;
+        console.log('✅ 模型加载成功！', model);
 
-        // 将模型添加到场景
-        scene.add(object);
-
-        // ---------- 核心调试：居中、缩放、强制材质、包围盒 ----------
-        // 计算包围盒
-        const box = new THREE.Box3().setFromObject(object);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-
-        console.log('📐 原始中心:', center, '原始尺寸:', size);
-
-        // 将模型移到原点
-        object.position.sub(center);
-
-        // 统一缩放，使最大边长变为 2（便于观察）
-        const maxDim = Math.max(size.x, size.y, size.z);
+        // 可选：自动缩放（如果模型尺寸不合适）
+        let box = new THREE.Box3().setFromObject(model);
+        let size = box.getSize(new THREE.Vector3());
+        let maxDim = Math.max(size.x, size.y, size.z);
         if (maxDim > 0) {
-            const scale = 2 / maxDim;
-            object.scale.set(scale, scale, scale);
-            console.log(`🔍 缩放因子: ${scale}`);
+            const scale = 2 / maxDim; // 使最大边长变为 2
+            model.scale.set(scale, scale, scale);
+            console.log(`🔍 自动缩放因子: ${scale}`);
         }
 
-        // 重新计算包围盒
-        box.setFromObject(object);
-        const newCenter = box.getCenter(new THREE.Vector3());
-        const newSize = box.getSize(new THREE.Vector3());
-        console.log('📏 新中心:', newCenter, '新尺寸:', newSize);
+        // 重新计算缩放后的包围盒
+        box = new THREE.Box3().setFromObject(model);
+        const min = box.min;
+        const center = box.getCenter(new THREE.Vector3());
 
-        // 强制所有网格为绿色双面材质（彻底解决材质/法线问题）
-        object.traverse((child) => {
-            if (child.isMesh) {
-                child.material = new THREE.MeshStandardMaterial({
-                    color: 0x00ff00,
-                    side: THREE.DoubleSide,   // 双面渲染，法线问题也不怕
-                    emissive: 0x004400,       // 微弱的自发光，避免全黑
-                    flatShading: false
-                });
-                // 如果材质原本有纹理，现在也被覆盖了，所以一定能看见
-            }
-        });
-        console.log('🎨 已强制覆盖材质为绿色双面材质');
+        // 平移模型，使底部对齐 y=0 并水平居中
+        const translation = new THREE.Vector3(-center.x, -min.y, -center.z);
+        model.position.copy(translation);
 
-        // 添加一个红色的包围盒线框，用来可视化模型的实际范围
-        const boxHelper = new THREE.BoxHelper(object, 0xff0000);
-        scene.add(boxHelper);
-        console.log('📦 已添加红色包围盒线框');
+        scene.add(model);
 
-        // 调整相机位置到合适距离
-        camera.position.set(3, 2, 3);
-        controls.target.set(0, 0, 0);
+        // 调整相机位置以适配模型
+        const finalBox = new THREE.Box3().setFromObject(model);
+        const finalCenter = finalBox.getCenter(new THREE.Vector3());
+        const finalSize = finalBox.getSize(new THREE.Vector3());
+        const maxDim2 = Math.max(finalSize.x, finalSize.y, finalSize.z);
+        camera.position.copy(finalCenter);
+        camera.position.x += maxDim2 * 1.5;
+        camera.position.y += maxDim2 * 0.5;
+        camera.position.z += maxDim2 * 1.5;
+        controls.target.copy(finalCenter);
         controls.update();
 
-        console.log('🎉 所有调试步骤完成，请观察场景中的绿色模型和红色线框。');
+        console.log('🎉 模型已就位，底部对齐 y=0。');
     },
     (xhr) => {
-        // 加载进度
         console.log(`⏳ 加载中... ${(xhr.loaded / xhr.total * 100).toFixed(2)}%`);
     },
     (error) => {

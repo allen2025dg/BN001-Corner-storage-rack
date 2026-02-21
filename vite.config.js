@@ -1,10 +1,12 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
-  // 如果你的项目不是部署在根路径（比如 GitHub 的用户主页），需要设置 base
-  // 例如：部署在 https://用户名.github.io/仓库名/
-  // base: '/仓库名/',
+  // ⚠️ 如果仓库名不是用户名.github.io，必须设置 base
+  // 例如：仓库名是 threejs-demo，就填 '/threejs-demo/'
+
+
+  base: './BN001-Corner-storage-rack/',              // 或者 '/仓库名/'
   build: {
-    outDir: 'dist',    // 默认就是 dist
+    outDir: 'dist',
   }
 })

@@ -5,8 +5,8 @@ export default defineConfig({
   // 例如：仓库名是 threejs-demo，就填 '/threejs-demo/'
 
    base: '/BN001-Corner-storage-rack/', // 注意开头和结尾的斜杠
-  // base: './BN001-Corner-storage-rack/',              // 或者 '/仓库名/'
-  build: {
+  //  base: '/',   // 临时改成根路径，方便本地测试
+   build: {
     outDir: 'dist',
   }
 })

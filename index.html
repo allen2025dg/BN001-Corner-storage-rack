@@ -16,6 +16,37 @@
             pointer-events: none;
             z-index: 100;
         }
+        /* 进度条容器 */
+        #progress-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 6px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 10px;
+            overflow: hidden;
+            z-index: 200;
+            display: none; /* 默认隐藏，开始加载时显示 */
+        }
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: #00ff88;
+            transition: width 0.2s ease;
+        }
+        #progress-text {
+            position: absolute;
+            top: calc(50% + 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px black;
+            z-index: 200;
+            display: none;
+        }
     </style>
 
     <script type="importmap">
@@ -26,9 +57,12 @@
             }
         }
     </script>
-  <script type="module" crossorigin src="/BN001-Corner-storage-rack/assets/index-CxgYN6Nh.js"></script>
+  <script type="module" crossorigin src="/BN001-Corner-storage-rack/assets/index-Dm9Vt-Yo.js"></script>
 </head>
 <body>
-    <div id="info">拖动旋转 | 滚轮缩放</div>
+    <div id="info">拖动旋转 | 滚轮缩放</div>
+    <div id="progress-container"><div id="progress-bar"></div></div>
+    <div id="progress-text">加载中 0%</div>
+
 </body>
 </html>

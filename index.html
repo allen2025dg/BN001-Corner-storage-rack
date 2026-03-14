@@ -1,124 +1,458 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>榫卯思维 · 产品系列</title>
+    <title>榫卯 · 家居收纳 | 宜家风格灵感</title>
     <style>
+        /* --- 全局基础样式 --- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
         }
+
         body {
-            background-color: #000;
-            color: #fff;
+            font-family: 'Roboto', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+            background-color: #f4f3f0; /* 宜家常用的暖灰背景 */
+            color: #111;
+            line-height: 1.5;
         }
+
+        /* 容器，内容居中 */
         .container {
-            min-height: 100vh;
-            display: flex;
-            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
         }
-        .card {
-            flex: 1 1 20%;
-            min-width: 280px;
-            height: 100vh;
-            background-size: cover;
-            background-position: center;
-            position: relative;
+
+        /* --- 顶部导航栏 --- */
+        .navbar {
+            background-color: #ffffff;
+            padding: 12px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar .container {
             display: flex;
-            align-items: flex-end;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 400;
+            font-size: 1rem;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .nav-menu a:hover {
+            border-bottom-color: #cc8b4d; /* 温暖的点缀色 */
+        }
+
+        /* --- 大广告区（轮播占位）--- */
+        .hero-banner {
+            margin: 30px 0 40px;
+            border-radius: 16px;
+            overflow: hidden;
+            background-color: #e9e2da; /* 占位色 */
+            height: 500px; /* 固定高度，可按需调整 */
+            display: flex;
+        }
+
+        .hero-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* 轮播指示点（仅为样式示例，实际轮播需JS） */
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: -30px;
+            position: relative;
+            z-index: 10;
+        }
+        .carousel-dots span {
+            width: 10px;
+            height: 10px;
+            background-color: #bbb;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .carousel-dots span.active {
+            background-color: #cc8b4d;
+        }
+
+        /* --- 通用区块样式 --- */
+        .section {
+            margin: 60px 0 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #222;
+        }
+
+        .section-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.95rem;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 2px;
+        }
+
+        .section-link:hover {
+            border-bottom-color: #cc8b4d;
+        }
+
+        /* --- 产品网格：明亮色块卡片 --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px 25px;
+        }
+
+        /* 卡片样式：纯白背景，柔和圆角，微阴影 */
+        .product-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
             text-decoration: none;
             color: inherit;
+            display: block;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+
+        .product-image {
+            aspect-ratio: 1 / 1;
+            background-color: #f0ede8; /* 图片占位色 */
+            width: 100%;
             overflow: hidden;
         }
-        /* 背景图 + 暗色渐变 */
-        .card:nth-child(1) { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), rgba(0,0,0,0.2)), url('assets/images/product1.jpg'); }
-        .card:nth-child(2) { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), rgba(0,0,0,0.2)), url('assets/images/product2.jpg'); }
-        .card:nth-child(3) { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), rgba(0,0,0,0.2)), url('assets/images/product3.jpg'); }
-        .card:nth-child(4) { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), rgba(0,0,0,0.2)), url('assets/images/product4.jpg'); }
-        .card:nth-child(5) { background-image: linear-gradient(0deg, rgba(0,0,0,0.5), rgba(0,0,0,0.2)), url('assets/images/product5.jpg'); }
 
-        .card-content {
-            padding: 2rem;
+        .product-image img {
             width: 100%;
-            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
-            transform: translateY(20%);
-            transition: transform 0.4s;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
-        .card:hover .card-content {
-            transform: translateY(0);
+
+        .product-info {
+            padding: 16px 14px 20px;
         }
-        .card h2 {
-            font-size: 2rem;
-            font-weight: 500;
-            margin-bottom: 0.25rem;
-            letter-spacing: 1px;
-        }
-        .card p {
-            font-size: 1rem;
-            opacity: 0.8;
-            margin-bottom: 1rem;
-        }
-        .btn {
+
+        /* 标签（新品/更低价格） */
+        .product-badge {
             display: inline-block;
-            padding: 0.5rem 1.5rem;
-            border: 1px solid #fff;
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-radius: 30px;
-            background: transparent;
-            transition: 0.2s;
+            background-color: #b32d1e; /* 宜家红 */
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
         }
-        .btn:hover {
-            background: #fff;
-            color: #000;
+
+        .badge-green {
+            background-color: #2d6e4d; /* 宜家绿色用于“更低价格”等 */
         }
-        @media (max-width: 1400px) {
-            .container { flex-direction: column; }
-            .card { width: 100%; height: 100vh; flex: none; }
+
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            line-height: 1.3;
+            color: #111;
+        }
+
+        .product-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-price {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #b32d1e; /* 价格用红色突出 */
+            margin-top: 10px;
+        }
+
+        /* 可选尺寸等 */
+        .product-meta {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 6px;
+        }
+
+        /* 分隔线 */
+        .divider {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 30px 0;
+        }
+
+        /* 响应式微调 */
+        @media (max-width: 768px) {
+            .navbar .container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 16px;
+            }
+            .hero-banner {
+                height: 300px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">榫卯·家</a>
+            <ul class="nav-menu">
+                <li><a href="#">所有作品</a></li>
+                <li><a href="#">厨房收纳</a></li>
+                <li><a href="#">卧室</a></li>
+                <li><a href="#">浴室</a></li>
+                <li><a href="#">客厅</a></li>
+                <li><a href="#">办公空间</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主要内容容器 -->
     <div class="container">
-        <a href="product1.html" class="card">
-            <div class="card-content">
-                <h2>转角收纳架</h2>
-                <p>充分利用角落空间</p>
-                <span class="btn">了解详情 →</span>
+        <!-- 大广告区（轮播占位，请替换图片） -->
+        <div class="hero-banner">
+            <!-- 三屏轮播（此处仅显示一张示例，实际轮播需额外功能） -->
+            <img src="https://via.placeholder.com/1920x500/f0ede8/aaa?text=广告图1" alt="广告1">
+        </div>
+        <!-- 轮播指示点（仅为样式，无功能） -->
+        <div class="carousel-dots">
+            <span class="active"></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- 近期推荐区块 -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">近期推荐</h2>
+                <a href="#" class="section-link">查看更多 →</a>
             </div>
-        </a>
-        <a href="product2.html" class="card">
-            <div class="card-content">
-                <h2>经典酒架</h2>
-                <p>低成本高利润</p>
-                <span class="btn">了解详情 →</span>
+            <div class="product-grid">
+                <!-- 卡片1 -->
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=SLIBB" alt="SLIBB斯利波">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-badge">新品</span>
+                        <h3 class="product-name">SLIBB斯利波</h3>
+                        <p class="product-desc">八齿袜夹 绿色</p>
+                        <div class="product-price">¥ 29.9</div>
+                    </div>
+                </a>
+                <!-- 卡片2 -->
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=SAGMASTARE" alt="SAGMASTARE索格麦斯">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-badge badge-green">更低价格</span>
+                        <h3 class="product-name">SAGMASTARE 索格麦斯</h3>
+                        <p class="product-desc">柜子 湖蓝灰色，83×36×128厘米</p>
+                        <div class="product-price">¥ 999</div>
+                    </div>
+                </a>
+                <!-- 卡片3 -->
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=RULLERUM" alt="RULLERUM鲁勒鲁姆">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">RULLERUM 鲁勒鲁姆</h3>
+                        <p class="product-desc">三人沙发配两张电动躺椅 哥兰/邦斯塔 金棕色</p>
+                        <div class="product-price">¥ 7,999</div>
+                        <div class="product-meta">尺寸 83×36×128厘米</div>
+                    </div>
+                </a>
+                <!-- 卡片4 可再补充 -->
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=新品" alt="新品">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-badge">新品</span>
+                        <h3 class="product-name">探索当季新品</h3>
+                        <p class="product-desc">超150款精选好物上线</p>
+                        <div class="product-price">¥ 39 起</div>
+                    </div>
+                </a>
             </div>
-        </a>
-        <a href="product3.html" class="card">
-            <div class="card-content">
-                <h2>3D打印机架</h2>
-                <p>稳固散热，模块化</p>
-                <span class="btn">了解详情 →</span>
+        </div>
+
+        <!-- 分隔线（可省略） -->
+        <hr class="divider">
+
+        <!-- 新品区块（示例） -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">新品</h2>
+                <a href="#" class="section-link">查看更多 →</a>
             </div>
-        </a>
-        <a href="product4.html" class="card">
-            <div class="card-content">
-                <h2>咖啡胶囊架</h2>
-                <p>整齐收纳，随手取用</p>
-                <span class="btn">了解详情 →</span>
+            <div class="product-grid">
+                <!-- 卡片1 -->
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=新品1" alt="新品1">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-badge">新品</span>
+                        <h3 class="product-name">创意收纳盒</h3>
+                        <p class="product-desc">白色 33x33x12厘米</p>
+                        <div class="product-price">¥ 79</div>
+                    </div>
+                </a>
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=新品2" alt="新品2">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">挂墙搁板</h3>
+                        <p class="product-desc">桦木贴面 80x20厘米</p>
+                        <div class="product-price">¥ 149</div>
+                    </div>
+                </a>
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=新品3" alt="新品3">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-badge">更低价格</span>
+                        <h3 class="product-name">多用衣架</h3>
+                        <p class="product-desc">黑色 4件装</p>
+                        <div class="product-price">¥ 19.9</div>
+                    </div>
+                </a>
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=新品4" alt="新品4">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">床边桌</h3>
+                        <p class="product-desc">白色 50x30厘米</p>
+                        <div class="product-price">¥ 199</div>
+                    </div>
+                </a>
             </div>
-        </a>
-        <a href="product5.html" class="card">
-            <div class="card-content">
-                <h2>茶包收纳架</h2>
-                <p>小空间 · 大有序</p>
-                <span class="btn">了解详情 →</span>
+        </div>
+
+        <!-- 更低价格区块 -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">更低价格</h2>
+                <a href="#" class="section-link">查看更多 →</a>
             </div>
-        </a>
+            <div class="product-grid">
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=低价1" alt="低价1">
+                    </div>
+                    <div class="product-info">
+                        <span class="product-badge badge-green">低于40元</span>
+                        <h3 class="product-name">八齿袜夹绿色</h3>
+                        <p class="product-desc">精选低于40元好物</p>
+                        <div class="product-price">¥ 9.9</div>
+                    </div>
+                </a>
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=低价2" alt="低价2">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">调味瓶</h3>
+                        <p class="product-desc">玻璃 3件套</p>
+                        <div class="product-price">¥ 29</div>
+                    </div>
+                </a>
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=低价3" alt="低价3">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">收纳篮</h3>
+                        <p class="product-desc">藤编 小号</p>
+                        <div class="product-price">¥ 39</div>
+                    </div>
+                </a>
+                <a href="#" class="product-card">
+                    <div class="product-image">
+                        <img src="https://via.placeholder.com/400x400/e0dbd2/999?text=低价4" alt="低价4">
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">挂钩</h3>
+                        <p class="product-desc">白色 3个装</p>
+                        <div class="product-price">¥ 9.9</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 底部留白 -->
+        <div style="height: 40px;"></div>
     </div>
+
+    <!-- 可选的简单页脚 -->
+    <footer style="background-color: #f0ede8; padding: 30px 0; text-align: center; color: #888; font-size: 0.9rem;">
+        <div class="container">
+            © 榫卯思维 · 从结构出发的家居设计
+        </div>
+    </footer>
 </body>
 </html>

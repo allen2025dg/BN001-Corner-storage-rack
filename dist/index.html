@@ -2,67 +2,468 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>产品3D展示</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>榫卯 · 家居收纳 | 产品系列</title>
     <style>
-        body { margin: 0; overflow: hidden; font-family: Arial, Helvetica, sans-serif; }
-        #info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            pointer-events: none;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
+            background-color: #f4f3f0;
+            color: #111;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        /* 顶部导航栏 */
+        .navbar {
+            background-color: #ffffff;
+            padding: 12px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
             z-index: 100;
         }
-        /* 进度条容器 */
-        #progress-container {
+
+        .navbar .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.6rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 400;
+            font-size: 1rem;
+            padding-bottom: 4px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .nav-menu a:hover {
+            border-bottom-color: #cc8b4d;
+        }
+
+        /* 全屏轮播广告区 */
+        .hero-carousel-wrapper {
+            width: 100%;
+            background-color: #f0ede8;
+        }
+
+        .hero-carousel {
+            position: relative;
+            width: 100%;
+            height: 800px; /* 匹配1920*800图片 */
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .carousel-slides {
+            position: relative;
+            height: 100%;
+            width: 100%;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .carousel-arrow {
             position: absolute;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 300px;
-            height: 6px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 10px;
-            overflow: hidden;
-            z-index: 200;
-            display: none; /* 默认隐藏，开始加载时显示 */
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255,255,255,0.7);
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            transition: background-color 0.2s;
+            z-index: 10;
         }
-        #progress-bar {
-            width: 0%;
-            height: 100%;
-            background: #00ff88;
-            transition: width 0.2s ease;
+
+        .carousel-arrow:hover {
+            background-color: rgba(255,255,255,0.9);
         }
-        #progress-text {
+
+        .carousel-arrow.prev {
+            left: 20px;
+        }
+
+        .carousel-arrow.next {
+            right: 20px;
+        }
+
+        .carousel-dots {
             position: absolute;
-            top: calc(50% + 20px);
+            bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            color: white;
-            font-size: 14px;
-            text-shadow: 1px 1px 2px black;
-            z-index: 200;
-            display: none;
+            display: flex;
+            gap: 12px;
+            z-index: 10;
         }
-    </style>
 
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+        .carousel-dots .dot {
+            width: 10px;
+            height: 10px;
+            background-color: #bbb;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .carousel-dots .dot.active {
+            background-color: #cc8b4d;
+        }
+
+        /* 产品网格区块标题 */
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #222;
+            margin: 60px 0 30px;
+            text-align: left;
+        }
+
+        /* 产品网格 - 固定3列 */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px 25px;
+            margin-bottom: 60px;
+        }
+
+        /* 响应式：当屏幕小于900px时改为2列，小于600px时改为1列 */
+        @media (max-width: 900px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
-    </script>
-  <script type="module" crossorigin src="/assets/index-Dm9Vt-Yo.js"></script>
+        @media (max-width: 600px) {
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 卡片样式（宜家风格） */
+        .product-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+
+        .product-image {
+            aspect-ratio: 1 / 1;
+            background-color: #f0ede8;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .product-info {
+            padding: 16px 14px 20px;
+        }
+
+        .product-badge {
+            display: inline-block;
+            background-color: #b32d1e;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .badge-green {
+            background-color: #2d6e4d;
+        }
+
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            line-height: 1.3;
+            color: #111;
+        }
+
+        .product-desc {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-price {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #b32d1e;
+            margin-top: 8px;
+        }
+
+        .product-meta {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #f0ede8;
+            padding: 30px 0;
+            text-align: center;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* 响应式导航栏调整 */
+        @media (max-width: 768px) {
+            .navbar .container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .nav-menu {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 16px;
+            }
+            .hero-carousel {
+                height: 400px;
+            }
+            .carousel-arrow {
+                width: 30px;
+                height: 30px;
+                font-size: 18px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="info">拖动旋转 | 滚轮缩放</div>
-    <div id="progress-container"><div id="progress-bar"></div></div>
-    <div id="progress-text">加载中 0%</div>
-
+    <!-- 顶部导航栏 -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">榫卯·家</a>
+            <ul class="nav-menu">
+                <li><a href="#">所有作品</a></li>
+                <li><a href="#">厨房收纳</a></li>
+                <li><a href="#">卧室</a></li>
+                <li><a href="#">浴室</a></li>
+                <li><a href="#">客厅</a></li>
+                <li><a href="#">办公空间</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 全屏轮播广告区 -->
+    <div class="hero-carousel-wrapper">
+        <div class="hero-carousel">
+            <div class="carousel-slides">
+                <img src="assets/images/gg01.png" alt="广告1" class="carousel-slide active">
+                <img src="assets/images/gg02.png" alt="广告2" class="carousel-slide">
+                <img src="assets/images/gg03.png" alt="广告3" class="carousel-slide">
+            </div>
+            <button class="carousel-arrow prev">❮</button>
+            <button class="carousel-arrow next">❯</button>
+            <div class="carousel-dots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要内容容器 -->
+    <div class="container">
+        <h2 class="section-title">产品系列</h2>
+        <div class="product-grid">
+            <!-- 产品卡片 1：转角收纳架（新品） -->
+            <a href="product1.html" class="product-card">
+                <div class="product-image">
+                    <img src="assets/images/product1.jpg" alt="转角收纳架">
+                </div>
+                <div class="product-info">
+                    <span class="product-badge">新品</span>
+                    <h3 class="product-name">转角收纳架</h3>
+                    <p class="product-desc">充分利用角落空间</p>
+                    <div class="product-price">¥ 59.9</div>
+                    <div class="product-meta">32×32×45厘米</div>
+                </div>
+            </a>
+
+            <!-- 产品卡片 2：吧台冰箱架（更低价格） -->
+            <a href="product2.html" class="product-card">
+                <div class="product-image">
+                    <img src="assets/images/product2.jpg" alt="吧台冰箱架">
+                </div>
+                <div class="product-info">
+                    <span class="product-badge badge-green">更低价格</span>
+                    <h3 class="product-name">吧台冰箱架</h3>
+                    <p class="product-desc">多层 可放冰箱 咖啡吧</p>
+                    <div class="product-price">¥ 89</div>
+                    <div class="product-meta">35×25×30厘米</div>
+                </div>
+            </a>
+
+            <!-- 产品卡片 3：3D打印机架 -->
+            <a href="product3.html" class="product-card">
+                <div class="product-image">
+                    <img src="assets/images/product3.jpg" alt="3D打印机架">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-name">3D打印机架</h3>
+                    <p class="product-desc">稳固散热 模块化设计</p>
+                    <div class="product-price">¥ 199</div>
+                    <div class="product-meta">50×40×60厘米</div>
+                </div>
+            </a>
+
+            <!-- 产品卡片 4：咖啡胶囊架（新品） -->
+            <a href="product4.html" class="product-card">
+                <div class="product-image">
+                    <img src="assets/images/product4.jpg" alt="咖啡胶囊架">
+                </div>
+                <div class="product-info">
+                    <span class="product-badge">新品</span>
+                    <h3 class="product-name">咖啡胶囊架</h3>
+                    <p class="product-desc">整齐收纳 取用方便</p>
+                    <div class="product-price">¥ 39</div>
+                    <div class="product-meta">20×15×25厘米</div>
+                </div>
+            </a>
+
+            <!-- 产品卡片 5：茶包收纳架（新品） -->
+            <a href="product5.html" class="product-card">
+                <div class="product-image">
+                    <img src="assets/images/product5.jpg" alt="茶包收纳架">
+                </div>
+                <div class="product-info">
+                    <span class="product-badge">新品</span>
+                    <h3 class="product-name">茶包收纳架</h3>
+                    <p class="product-desc">小空间·大有序</p>
+                    <div class="product-price">¥ 49</div>
+                    <div class="product-meta">15×15×20厘米</div>
+                </div>
+            </a>
+
+            <!-- 产品卡片 6：桌面收纳架（新品） -->
+            <a href="product6.html" class="product-card">
+                <div class="product-image">
+                    <img src="assets/images/product6.jpg" alt="桌面收纳架">
+                </div>
+                <div class="product-info">
+                    <span class="product-badge">新品</span>
+                    <h3 class="product-name">桌面收纳架</h3>
+                    <p class="product-desc">整洁桌面 有序办公</p>
+                    <div class="product-price">¥ 69</div>
+                    <div class="product-meta">25×18×15厘米</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <!-- 页脚 -->
+    <footer>
+        <div class="container">
+            © 榫卯思维 · 从结构出发的家居设计
+        </div>
+    </footer>
+
+    <!-- 轮播交互脚本 -->
+    <script>
+        (function() {
+            const slides = document.querySelectorAll('.carousel-slide');
+            const dots = document.querySelectorAll('.dot');
+            const prevBtn = document.querySelector('.carousel-arrow.prev');
+            const nextBtn = document.querySelector('.carousel-arrow.next');
+            let currentIndex = 0;
+            const totalSlides = slides.length;
+
+            function showSlide(index) {
+                if (index < 0) index = totalSlides - 1;
+                if (index >= totalSlides) index = 0;
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === index);
+                });
+                currentIndex = index;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                showSlide(currentIndex - 1);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                showSlide(currentIndex + 1);
+            });
+
+            dots.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    showSlide(i);
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

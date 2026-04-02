@@ -4,302 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>榫卯 · 家居收纳 | 产品系列</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto', 'Noto Sans SC', 'Helvetica Neue', sans-serif;
-            background-color: #f4f3f0;
-            color: #111;
-            line-height: 1.5;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 30px;
-        }
-
-        /* 顶部导航栏 */
-        .navbar {
-            background-color: #ffffff;
-            padding: 12px 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            font-size: 1.6rem;
-            font-weight: 500;
-            letter-spacing: 2px;
-            color: #222;
-            text-decoration: none;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 32px;
-            list-style: none;
-        }
-
-        .nav-menu a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 400;
-            font-size: 1rem;
-            padding-bottom: 4px;
-            border-bottom: 2px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        .nav-menu a:hover {
-            border-bottom-color: #cc8b4d;
-        }
-
-        /* 全屏轮播广告区 */
-        .hero-carousel-wrapper {
-            width: 100%;
-            background-color: #f0ede8;
-        }
-
-        .hero-carousel {
-            position: relative;
-            width: 100%;
-            height: 800px; /* 匹配1920*800图片 */
-            margin: 0;
-            overflow: hidden;
-        }
-
-        .carousel-slides {
-            position: relative;
-            height: 100%;
-            width: 100%;
-        }
-
-        .carousel-slide {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            pointer-events: none;
-        }
-
-        .carousel-slide.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .carousel-arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255,255,255,0.7);
-            border: none;
-            border-radius: 50%;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #333;
-            transition: background-color 0.2s;
-            z-index: 10;
-        }
-
-        .carousel-arrow:hover {
-            background-color: rgba(255,255,255,0.9);
-        }
-
-        .carousel-arrow.prev {
-            left: 20px;
-        }
-
-        .carousel-arrow.next {
-            right: 20px;
-        }
-
-        .carousel-dots {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 12px;
-            z-index: 10;
-        }
-
-        .carousel-dots .dot {
-            width: 10px;
-            height: 10px;
-            background-color: #bbb;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .carousel-dots .dot.active {
-            background-color: #cc8b4d;
-        }
-
-        /* 产品网格区块标题 */
-        .section-title {
-            font-size: 1.8rem;
-            font-weight: 400;
-            color: #222;
-            margin: 60px 0 30px;
-            text-align: left;
-        }
-
-        /* 产品网格 - 固定3列 */
-        .product-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 30px 25px;
-            margin-bottom: 60px;
-        }
-
-        /* 响应式：当屏幕小于900px时改为2列，小于600px时改为1列 */
-        @media (max-width: 900px) {
-            .product-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 600px) {
-            .product-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* 卡片样式（宜家风格） */
-        .product-card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .product-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-        }
-
-        .product-image {
-            aspect-ratio: 1 / 1;
-            background-color: #f0ede8;
-            width: 100%;
-            overflow: hidden;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .product-info {
-            padding: 16px 14px 20px;
-        }
-
-        .product-badge {
-            display: inline-block;
-            background-color: #b32d1e;
-            color: white;
-            font-size: 0.7rem;
-            font-weight: 500;
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-
-        .badge-green {
-            background-color: #2d6e4d;
-        }
-
-        .product-name {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 6px;
-            line-height: 1.3;
-            color: #111;
-        }
-
-        .product-desc {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 8px;
-            line-height: 1.4;
-        }
-
-        .product-price {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #b32d1e;
-            margin-top: 8px;
-        }
-
-        .product-meta {
-            font-size: 0.8rem;
-            color: #888;
-            margin-top: 4px;
-        }
-
-        /* 页脚 */
-        footer {
-            background-color: #f0ede8;
-            padding: 30px 0;
-            text-align: center;
-            color: #888;
-            font-size: 0.9rem;
-        }
-
-        /* 响应式导航栏调整 */
-        @media (max-width: 768px) {
-            .navbar .container {
-                flex-direction: column;
-                gap: 15px;
-            }
-            .nav-menu {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 16px;
-            }
-            .hero-carousel {
-                height: 400px;
-            }
-            .carousel-arrow {
-                width: 30px;
-                height: 30px;
-                font-size: 18px;
-            }
-        }
-    </style>
+    <!-- 引入外部首页样式 -->
+    <link rel="stylesheet" href="/assets/css/index.css">
 </head>
 <body>
-    <!-- 顶部导航栏 -->
     <nav class="navbar">
         <div class="container">
             <a href="index.html" class="logo">榫卯·家</a>
@@ -314,7 +22,6 @@
         </div>
     </nav>
 
-    <!-- 全屏轮播广告区 -->
     <div class="hero-carousel-wrapper">
         <div class="hero-carousel">
             <div class="carousel-slides">
@@ -332,11 +39,10 @@
         </div>
     </div>
 
-    <!-- 主要内容容器 -->
     <div class="container">
         <h2 class="section-title">产品系列</h2>
         <div class="product-grid">
-            <!-- 产品卡片 1：转角收纳架（新品） -->
+            <!-- 产品卡片 1：转角收纳架 -->
             <a href="product1.html" class="product-card">
                 <div class="product-image">
                     <img src="assets/images/product1.jpg" alt="转角收纳架">
@@ -350,7 +56,7 @@
                 </div>
             </a>
 
-            <!-- 产品卡片 2：吧台冰箱架（更低价格） -->
+            <!-- 产品卡片 2：吧台冰箱架 -->
             <a href="product2.html" class="product-card">
                 <div class="product-image">
                     <img src="assets/images/product2.jpg" alt="吧台冰箱架">
@@ -377,7 +83,7 @@
                 </div>
             </a>
 
-            <!-- 产品卡片 4：咖啡胶囊架（新品） -->
+            <!-- 产品卡片 4：咖啡胶囊架 -->
             <a href="product4.html" class="product-card">
                 <div class="product-image">
                     <img src="assets/images/product4.jpg" alt="咖啡胶囊架">
@@ -391,7 +97,7 @@
                 </div>
             </a>
 
-            <!-- 产品卡片 5：茶包收纳架（新品） -->
+            <!-- 产品卡片 5：茶包收纳架 -->
             <a href="product5.html" class="product-card">
                 <div class="product-image">
                     <img src="assets/images/product5.jpg" alt="茶包收纳架">
@@ -405,7 +111,7 @@
                 </div>
             </a>
 
-            <!-- 产品卡片 6：桌面收纳架（新品） -->
+            <!-- 产品卡片 6：桌面收纳架 -->
             <a href="product6.html" class="product-card">
                 <div class="product-image">
                     <img src="assets/images/product6.jpg" alt="桌面收纳架">
@@ -421,14 +127,12 @@
         </div>
     </div>
 
-    <!-- 页脚 -->
     <footer>
         <div class="container">
             © 榫卯思维 · 从结构出发的家居设计
         </div>
     </footer>
 
-    <!-- 轮播交互脚本 -->
     <script>
         (function() {
             const slides = document.querySelectorAll('.carousel-slide');
@@ -453,11 +157,9 @@
             prevBtn.addEventListener('click', () => {
                 showSlide(currentIndex - 1);
             });
-
             nextBtn.addEventListener('click', () => {
                 showSlide(currentIndex + 1);
             });
-
             dots.forEach((dot, i) => {
                 dot.addEventListener('click', () => {
                     showSlide(i);

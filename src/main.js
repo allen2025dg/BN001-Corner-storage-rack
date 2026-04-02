@@ -2,30 +2,21 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 // --- 初始化场景、相机、渲染器 ---
 const scene = new THREE.Scene();
-
-// ================= 渐变背景 =================
-const canvas = document.createElement('canvas');
-canvas.width = 2;
-canvas.height = 256;
-const ctx = canvas.getContext('2d');
-const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-gradient.addColorStop(0, '#666666');   // 顶部中灰
-gradient.addColorStop(1, '#ffffff');   // 底部白色
-ctx.fillStyle = gradient;
-ctx.fillRect(0, 0, canvas.width, canvas.height);
-const backgroundTexture = new THREE.CanvasTexture(canvas);
-scene.background = backgroundTexture;
-// ===========================================
+scene.background = new THREE.Color(0xcccccc); // 浅灰背景
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(3, 2, 5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true;
+renderer.shadowMap.enabled = true; // 开启阴影映射
+renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 柔和阴影
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.6; // 降低曝光，平衡 HDR 亮度
 document.body.appendChild(renderer.domElement);
 
 // --- 控制器 ---
@@ -37,42 +28,84 @@ controls.autoRotateSpeed = 1.0;
 controls.target.set(0, 0, 0);
 
 // ================= 灯光系统 =================
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+// 环境光强度调低，避免过曝
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
 scene.add(ambientLight);
 
-const mainLight = new THREE.DirectionalLight(0xffffff, 1.5);
+// 主光源：方向光，开启阴影
+const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
 mainLight.position.set(3, 5, 3);
+mainLight.castShadow = true;
+mainLight.receiveShadow = false;
+mainLight.shadow.mapSize.width = 1024;
+mainLight.shadow.mapSize.height = 1024;
+mainLight.shadow.camera.near = 0.5;
+mainLight.shadow.camera.far = 8;
+mainLight.shadow.camera.left = -5;
+mainLight.shadow.camera.right = 5;
+mainLight.shadow.camera.top = 5;
+mainLight.shadow.camera.bottom = -5;
 scene.add(mainLight);
 
-const fillLightLeft = new THREE.DirectionalLight(0xffeedd, 0.8);
+// 辅助光：左侧暖色
+const fillLightLeft = new THREE.DirectionalLight(0xffeedd, 0.6);
 fillLightLeft.position.set(-3, 2, 2);
 scene.add(fillLightLeft);
 
-const backLight = new THREE.DirectionalLight(0xffffff, 0.5);
+// 背光：冷色，增强轮廓
+const backLight = new THREE.DirectionalLight(0xffffff, 0.4);
 backLight.position.set(0, 2, -4);
 scene.add(backLight);
 
-const bottomLight = new THREE.PointLight(0xffffff, 0.4);
+// 底部补光
+const bottomLight = new THREE.PointLight(0xffffff, 0.3);
 bottomLight.position.set(0, -2, 0);
 scene.add(bottomLight);
 
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.8);
+// 半球光：模拟环境反射
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
 hemiLight.position.set(0, 5, 0);
 scene.add(hemiLight);
 // ===========================================
 
-// --- 网格已移除 ---
+// ================= 环境贴图（HDRI）=================
+new RGBELoader()
+    .setPath('assets/hdr/')
+    .load('studio_small_03_1k.hdr', (texture) => {
+        texture.mapping = THREE.EquirectangularRefractionMapping;
+        scene.environment = texture;
+        // scene.background = texture; // 若需背景也换为 HDR，取消注释
+    });
+// ===========================================
 
-// --- DOM 元素引用 ---
-const logoContainer = document.getElementById('logo-container');
-const progressContainer = document.getElementById('progress-container');
+// --- 动态创建加载元素（所有样式由CSS控制）---
+const logoContainer = document.createElement('div');
+logoContainer.id = 'logo-container';
+logoContainer.className = 'loading-logo';
+logoContainer.innerHTML = `
+    <div>榫卯·家</div>
+    <div style="font-size: 14px; margin-top: 10px;">加载中...</div>
+`;
+document.body.appendChild(logoContainer);
+
+const progressContainer = document.createElement('div');
+progressContainer.id = 'progress-container';
+progressContainer.className = 'progress-container';
+progressContainer.innerHTML = `
+    <div style="margin-bottom: 10px;">加载模型中...</div>
+    <div style="width:100%; height:20px; background:#444; border-radius:10px;">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="progress-text">0%</div>
+`;
+document.body.appendChild(progressContainer);
 const progressBar = document.getElementById('progress-bar');
 const progressText = document.getElementById('progress-text');
 
 // --- 中英文文案映射 ---
 const i18n = {
     zh: {
-        productTitle: '转角收纳架',
+        productTitle: window.PRODUCT_NAME_ZH || '转角收纳架',
         styleLabel: '款式',
         style1: '原木色',
         style2: '黑色',
@@ -85,7 +118,7 @@ const i18n = {
         copyBtn: '复制',
     },
     en: {
-        productTitle: 'Corner Shelf',
+        productTitle: window.PRODUCT_NAME_EN || 'Corner Shelf',
         styleLabel: 'Style',
         style1: 'Natural Wood',
         style2: 'Black',
@@ -118,15 +151,15 @@ function updateLanguage(lang) {
     document.getElementById(`lang-${lang}`).classList.add('active');
 }
 
-// --- 加载模型（支持 Draco 压缩）---
+// --- 加载模型 ---
 const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.6/');
 loader.setDRACOLoader(dracoLoader);
 
 const modelFileName = window.MODEL_URL || 'assets/models/p1.glb';
-
 let currentModel = null;
+let groundPlane = null; // 用于存储地面对象
 
 if (progressContainer) progressContainer.style.display = 'block';
 
@@ -136,6 +169,7 @@ loader.load(
         currentModel = gltf.scene;
         console.log('✅ 模型加载成功！');
 
+        // 自动缩放和居中
         const box = new THREE.Box3().setFromObject(currentModel);
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
@@ -149,11 +183,40 @@ loader.load(
         const center = box.getCenter(new THREE.Vector3());
         currentModel.position.set(-center.x, -min.y, -center.z);
 
+        // 开启模型阴影投射
+        currentModel.traverse((child) => {
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = false;
+            }
+        });
+
         scene.add(currentModel);
 
+        // 添加平面地面（根据模型大小动态调整）
         const finalBox = new THREE.Box3().setFromObject(currentModel);
-        const finalCenter = finalBox.getCenter(new THREE.Vector3());
+        const finalMin = finalBox.min;
         const finalSize = finalBox.getSize(new THREE.Vector3());
+        const groundRadius = Math.max(finalSize.x, finalSize.z) * 0.8 + 0.5; // 半径略大于模型底部范围
+
+        // 创建圆形平面，半透明材质，接收阴影
+        const groundGeometry = new THREE.CircleGeometry(groundRadius, 32);
+        const groundMaterial = new THREE.MeshStandardMaterial({
+            color: 0xcccccc,
+            roughness: 0.8,
+            metalness: 0.1,
+            transparent: true,
+            opacity: 0.6
+        });
+        groundPlane = new THREE.Mesh(groundGeometry, groundMaterial);
+        groundPlane.rotation.x = -Math.PI / 2; // 平躺
+        groundPlane.position.y = finalMin.y - 0.05; // 略微低于模型底部
+        groundPlane.receiveShadow = true;
+        groundPlane.castShadow = false;
+        scene.add(groundPlane);
+
+        // 调整相机位置
+        const finalCenter = finalBox.getCenter(new THREE.Vector3());
         const maxDim2 = Math.max(finalSize.x, finalSize.y, finalSize.z);
         camera.position.copy(finalCenter);
         camera.position.x += maxDim2 * 1.5;
@@ -180,7 +243,7 @@ loader.load(
     }
 );
 
-// --- 款式切换（基于颜色）---
+// --- 款式切换（颜色）---
 const styleColors = {
     style1: 0x8B5A2B,
     style2: 0x000000,

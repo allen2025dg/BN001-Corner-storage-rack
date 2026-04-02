@@ -1,12 +1,31 @@
 import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 export default defineConfig({
-  // ⚠️ 如果仓库名不是用户名.github.io，必须设置 base
-  // 例如：仓库名是 threejs-demo，就填 '/threejs-demo/'
-
-  //  base: '/BN001-Corner-storage-rack/', // 注意开头和结尾的斜杠
-   base: '/',   // 临时改成根路径，方便本地测试
-   build: {
+  base: '/',   // 直接部署在网站根目录
+  build: {
     outDir: 'dist',
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        product1: resolve(__dirname, 'product1.html'),
+        product2: resolve(__dirname, 'product2.html'),
+        product3: resolve(__dirname, 'product3.html'),
+        product4: resolve(__dirname, 'product4.html'),
+        product5: resolve(__dirname, 'product5.html'),
+        product6: resolve(__dirname, 'product6.html'),
+      },
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('three')) {
+              return 'three-vendor';
+            }
+            return 'vendor';
+          }
+        }
+      }
+    },
+    chunkSizeWarningLimit: 1000
   }
 })

@@ -3,21 +3,31 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 
 // --- 初始化场景、相机、渲染器 ---
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xcccccc); // 浅灰背景
+scene.background = new THREE.Color(0xcccccc);
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.set(3, 2, 5);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.shadowMap.enabled = true; // 开启阴影映射
-renderer.shadowMap.type = THREE.PCFSoftShadowMap; // 柔和阴影
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.6; // 降低曝光，平衡 HDR 亮度
+renderer.toneMappingExposure = 0.8;
 document.body.appendChild(renderer.domElement);
+
+// --- CSS2渲染器（用于文字标签）---
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.top = '0px';
+labelRenderer.domElement.style.left = '0px';
+labelRenderer.domElement.style.pointerEvents = 'none';
+document.body.appendChild(labelRenderer.domElement);
 
 // --- 控制器 ---
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -28,42 +38,36 @@ controls.autoRotateSpeed = 1.0;
 controls.target.set(0, 0, 0);
 
 // ================= 灯光系统 =================
-// 环境光强度调低，避免过曝
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
 scene.add(ambientLight);
 
-// 主光源：方向光，开启阴影
-const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
-mainLight.position.set(3, 5, 3);
+const mainLight = new THREE.DirectionalLight(0xffffff, 1.0);
+mainLight.position.set(3, 5, 2);
 mainLight.castShadow = true;
 mainLight.receiveShadow = false;
 mainLight.shadow.mapSize.width = 1024;
 mainLight.shadow.mapSize.height = 1024;
 mainLight.shadow.camera.near = 0.5;
 mainLight.shadow.camera.far = 8;
-mainLight.shadow.camera.left = -5;
-mainLight.shadow.camera.right = 5;
-mainLight.shadow.camera.top = 5;
-mainLight.shadow.camera.bottom = -5;
+mainLight.shadow.camera.left = -3;
+mainLight.shadow.camera.right = 3;
+mainLight.shadow.camera.top = 3;
+mainLight.shadow.camera.bottom = -3;
 scene.add(mainLight);
 
-// 辅助光：左侧暖色
-const fillLightLeft = new THREE.DirectionalLight(0xffeedd, 0.6);
-fillLightLeft.position.set(-3, 2, 2);
-scene.add(fillLightLeft);
+const fillLeft = new THREE.DirectionalLight(0xffcc88, 0.5);
+fillLeft.position.set(-2, 1, 1.5);
+scene.add(fillLeft);
 
-// 背光：冷色，增强轮廓
-const backLight = new THREE.DirectionalLight(0xffffff, 0.4);
-backLight.position.set(0, 2, -4);
-scene.add(backLight);
+const rimLight = new THREE.PointLight(0xffaa66, 0.6);
+rimLight.position.set(1.5, 1.2, -2.5);
+scene.add(rimLight);
 
-// 底部补光
-const bottomLight = new THREE.PointLight(0xffffff, 0.3);
-bottomLight.position.set(0, -2, 0);
-scene.add(bottomLight);
+const bottomFill = new THREE.PointLight(0xffffff, 0.3);
+bottomFill.position.set(0, -1.5, 0);
+scene.add(bottomFill);
 
-// 半球光：模拟环境反射
-const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+const hemiLight = new THREE.HemisphereLight(0xffffff, 0x888888, 0.5);
 hemiLight.position.set(0, 5, 0);
 scene.add(hemiLight);
 // ===========================================
@@ -74,11 +78,10 @@ new RGBELoader()
     .load('studio_small_03_1k.hdr', (texture) => {
         texture.mapping = THREE.EquirectangularRefractionMapping;
         scene.environment = texture;
-        // scene.background = texture; // 若需背景也换为 HDR，取消注释
     });
 // ===========================================
 
-// --- 动态创建加载元素（所有样式由CSS控制）---
+// --- 动态创建加载元素 ---
 const logoContainer = document.createElement('div');
 logoContainer.id = 'logo-container';
 logoContainer.className = 'loading-logo';
@@ -159,7 +162,7 @@ loader.setDRACOLoader(dracoLoader);
 
 const modelFileName = window.MODEL_URL || 'assets/models/p1.glb';
 let currentModel = null;
-let groundPlane = null; // 用于存储地面对象
+let groundPlane = null;
 
 if (progressContainer) progressContainer.style.display = 'block';
 
@@ -193,13 +196,12 @@ loader.load(
 
         scene.add(currentModel);
 
-        // 添加平面地面（根据模型大小动态调整）
+        // 添加平面地面
         const finalBox = new THREE.Box3().setFromObject(currentModel);
         const finalMin = finalBox.min;
         const finalSize = finalBox.getSize(new THREE.Vector3());
-        const groundRadius = Math.max(finalSize.x, finalSize.z) * 0.8 + 0.5; // 半径略大于模型底部范围
+        const groundRadius = Math.max(finalSize.x, finalSize.z) * 0.8 + 0.5;
 
-        // 创建圆形平面，半透明材质，接收阴影
         const groundGeometry = new THREE.CircleGeometry(groundRadius, 32);
         const groundMaterial = new THREE.MeshStandardMaterial({
             color: 0xcccccc,
@@ -209,13 +211,13 @@ loader.load(
             opacity: 0.6
         });
         groundPlane = new THREE.Mesh(groundGeometry, groundMaterial);
-        groundPlane.rotation.x = -Math.PI / 2; // 平躺
-        groundPlane.position.y = finalMin.y - 0.05; // 略微低于模型底部
+        groundPlane.rotation.x = -Math.PI / 2;
+        groundPlane.position.y = finalMin.y - 0.05;
         groundPlane.receiveShadow = true;
         groundPlane.castShadow = false;
         scene.add(groundPlane);
 
-        // 调整相机位置
+        // 调整相机
         const finalCenter = finalBox.getCenter(new THREE.Vector3());
         const maxDim2 = Math.max(finalSize.x, finalSize.y, finalSize.z);
         camera.position.copy(finalCenter);
@@ -224,6 +226,9 @@ loader.load(
         camera.position.z += maxDim2 * 1.5;
         controls.target.copy(finalCenter);
         controls.update();
+
+        // ---- 添加热点标注 ----
+        addHotspots(currentModel);
 
         if (logoContainer) logoContainer.classList.add('hidden');
         if (progressContainer) progressContainer.style.display = 'none';
@@ -242,6 +247,33 @@ loader.load(
         alert('模型加载失败，请刷新重试。');
     }
 );
+
+// --- 热点标注函数 ---
+function addHotspots(model) {
+    // 热点数据：名称和位置（位置需要根据实际模型调整）
+    const hotspots = [
+        { name: '层板 · 实木', position: new THREE.Vector3(0.2, 0.3, 0.1) },
+        { name: '金属支架 · 承重20kg', position: new THREE.Vector3(-0.3, 0.1, 0.2) },
+        { name: '尺寸: 32×32×45cm', position: new THREE.Vector3(0, 0.5, 0.3) }
+    ];
+
+    hotspots.forEach(hot => {
+        const div = document.createElement('div');
+        div.textContent = hot.name;
+        div.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        div.style.color = 'white';
+        div.style.padding = '4px 8px';
+        div.style.borderRadius = '20px';
+        div.style.fontSize = '14px';
+        div.style.fontFamily = 'Arial, sans-serif';
+        div.style.whiteSpace = 'nowrap';
+        div.style.border = '1px solid rgba(255,255,255,0.3)';
+        div.style.pointerEvents = 'none';
+        const label = new CSS2DObject(div);
+        label.position.copy(hot.position);
+        model.add(label); // 标签跟随模型变换
+    });
+}
 
 // --- 款式切换（颜色）---
 const styleColors = {
@@ -329,6 +361,7 @@ function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
+    labelRenderer.render(scene, camera); // 渲染 CSS2D 标签
 }
 animate();
 
@@ -338,4 +371,5 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
 }

@@ -80,30 +80,16 @@ new RGBELoader()
         scene.environment = texture;
     });
 // ===========================================
-
-// --- 动态创建加载元素 ---
-const logoContainer = document.createElement('div');
-logoContainer.id = 'logo-container';
-logoContainer.className = 'loading-logo';
-logoContainer.innerHTML = `
-    <div>榫卯·家</div>
-    <div style="font-size: 14px; margin-top: 10px;">加载中...</div>
-`;
-document.body.appendChild(logoContainer);
-
-const progressContainer = document.createElement('div');
-progressContainer.id = 'progress-container';
-progressContainer.className = 'progress-container';
-progressContainer.innerHTML = `
-    <div style="margin-bottom: 10px;">加载模型中...</div>
-    <div style="width:100%; height:20px; background:#444; border-radius:10px;">
-        <div id="progress-bar"></div>
-    </div>
-    <div id="progress-text">0%</div>
-`;
-document.body.appendChild(progressContainer);
+// --- 获取加载元素（已在 HTML 中静态定义）---
+const logoContainer = document.getElementById('logo-container');
+const progressContainer = document.getElementById('progress-container');
 const progressBar = document.getElementById('progress-bar');
 const progressText = document.getElementById('progress-text');
+
+// 加载开始前显示进度容器（初始为 display:none）
+if (progressContainer) progressContainer.style.display = 'block';
+
+
 
 // --- 中英文文案映射 ---
 const i18n = {

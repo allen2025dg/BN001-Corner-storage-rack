@@ -14,6 +14,8 @@ export default defineConfig({
         product4: resolve(__dirname, 'product4.html'),
         product5: resolve(__dirname, 'product5.html'),
         product6: resolve(__dirname, 'product6.html'),
+        product7: resolve(__dirname, 'product7.html'),
+        product8: resolve(__dirname, 'product8.html'),
       },
       output: {
         manualChunks(id) {

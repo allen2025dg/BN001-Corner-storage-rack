@@ -4,14 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>茶包收纳架 · 3D展示</title>
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
-                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
-            }
-        }
-    </script>
+
     <!-- 引入 qrcode 库（用于生成二维码） -->
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <style>
@@ -195,6 +188,16 @@
             transition: width 0.2s;
         }
     </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+  <script type="module" crossorigin src="/assets/three-vendor-Dk7gV2UV.js"></script>
+  <script type="module" crossorigin src="/assets/main-B7IHBxsP.js"></script>
 </head>
 <body>
     <a href="index.html" class="back-home">← 返回列表</a>
@@ -261,7 +264,6 @@
 
     <script>
         window.MODEL_URL = 'assets/models/p5.glb';  // 当前产品模型
-    </script>
-    <script type="module" src="/src/main.js"></script>
+    </script>
 </body>
 </html>
